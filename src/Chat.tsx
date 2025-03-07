@@ -1,9 +1,6 @@
 // src/Chat.tsx
 import React, { useState, useRef, useEffect } from "react";
 import { getStreamingResponse } from "../api/openai";
-import "./Chat.css";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { SseClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 
 interface Message {
   id: string;
@@ -75,19 +72,23 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="chat-container">
-      <div className="messages-container">
+    <div className="flex flex-col h-80vh max-w-3xl mx-auto border border-gray-300 rounded-lg overflow-hidden shadow-md">
+      <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-3 bg-gray-100">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`message ${
-              msg.role === "user" ? "user-message" : "assistant-message"
+            className={`max-w-[80%] p-3 rounded-2xl break-words whitespace-pre-wrap ${
+              msg.role === "user"
+                ? "self-end bg-blue-500 text-white rounded-br-sm"
+                : "self-start bg-white text-gray-800 rounded-bl-sm shadow"
             }`}
           >
-            <div className="message-content">
+            <div className="leading-relaxed">
               {msg.content ||
                 (msg.role === "assistant" && isStreaming ? (
-                  <span className="typing-indicator">...</span>
+                  <span className="inline-block w-5 text-center animate-pulse">
+                    ...
+                  </span>
                 ) : (
                   ""
                 ))}
@@ -97,19 +98,22 @@ const Chat: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="input-form">
+      <form
+        onSubmit={handleSubmit}
+        className="flex p-3 bg-white border-t border-gray-200"
+      >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
           disabled={isStreaming}
-          className="message-input"
+          className="flex-1 px-4 py-3 border border-gray-300 rounded-full outline-none focus:border-blue-500 text-base"
         />
         <button
           type="submit"
           disabled={isStreaming || !input.trim()}
-          className="send-button"
+          className="ml-2 px-5 py-3 bg-blue-500 text-white rounded-full text-base cursor-pointer transition-colors hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           {isStreaming ? "Streaming..." : "Send"}
         </button>
